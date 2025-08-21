@@ -1,0 +1,19 @@
+{
+  "name": "backend-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon --exec ts-node ./src/server.ts",
+    "start": "nodemon ./dist/server.js",
+    "test": "yarn jest",
+    "prod": "npm run build && npm run start"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.2"
+  }
+}
