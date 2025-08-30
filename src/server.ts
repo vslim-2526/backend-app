@@ -1,1 +1,45 @@
-console.log("Hello, World!");
+import express from "express";
+import env from "dotenv";
+import cors from "cors";
+
+import { ChatController, ExpenseController } from "./app/controller";
+import * as Utils from "./app/utils";
+import * as Middlewares from "./app/middleware/index";
+
+env.config();
+const app = express();
+const PORT = parseInt(process.env.PORT) || 8000;
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: "*" }));
+
+// app.use(Middlewares.disableCors);
+
+app.use("/v1/chat", (req, res, next) => {
+  const sanInput = Utils.sanitizeString(req.body.utterance || "");
+  const chatController = new ChatController();
+  next();
+});
+
+app.post("/v1/expense", (req, res, next) => {
+  const sanInput = Object.fromEntries(
+    Object.entries(req.body).map(([k, v]) => [
+      k,
+      Utils.sanitizeString(v as string),
+    ])
+  );
+
+  const expenseController = new ExpenseController();
+  next();
+});
+
+// app.use(GlobalErrorHandler);
+
+app.get("/health", (req, res, next) => {
+  res.status(200).json({ status: "OK", message: "Healthy!" });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port: ${PORT}, env: ${process.env.ENV}`);
+});
