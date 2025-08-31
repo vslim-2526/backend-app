@@ -20,7 +20,15 @@ app.use("/v1/chat", (req, res, next) => {
   next();
 });
 
-app.post("/v1/expense", async (req, res, next) => {
+app.get("/v1/expense/one/:expense_id", async (req, res, next) => {
+  const sanInput = Utils.sanitizeString(req.params.expense_id || "");
+
+  const result = await new ExpenseController().getAnExpense(sanInput);
+  res.status(200).json(result);
+  next();
+});
+
+app.post("/v1/expense/one", async (req, res, next) => {
   const sanInput = Object.fromEntries(
     Object.entries(req.body).map(([k, v]) => [
       k,
@@ -28,12 +36,10 @@ app.post("/v1/expense", async (req, res, next) => {
     ])
   );
 
-  const result = await new ExpenseController().addExpense(sanInput);
+  const result = await new ExpenseController().createAnExpense(sanInput);
   res.status(200).json(result);
   next();
 });
-
-// app.use(GlobalErrorHandler);
 
 app.get("/health", (req, res, next) => {
   res.status(200).json({ status: "OK", message: "Healthy!" });
