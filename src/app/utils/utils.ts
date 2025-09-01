@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export function sanitizeString(input: string): string {
   let output = input.toString();
 
@@ -49,6 +51,24 @@ export function extractCriteriaForSearch(query: any): any {
       criteria.paid_at.$lte = new Date(
         String(`${query.paid_before} 23:59:59Z`)
       );
+  }
+
+  if (query._ids) {
+    const ids = Array.isArray(query._ids)
+      ? query._ids
+      : String(query._ids).split(",");
+
+    criteria._id = {
+      $in: ids
+        .map((id) => {
+          try {
+            return new ObjectId(id);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean), // remove invalid ObjectIds
+    };
   }
 
   return criteria;
