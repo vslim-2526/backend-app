@@ -49,6 +49,24 @@ app.post("/v1/expense/one", async (req, res, next) => {
   next();
 });
 
+app.post("/v1/expense/many", async (req, res, next) => {
+  if (!Array.isArray(req.body)) {
+    return res.status(400).json({ error: "Request body must be an array" });
+  }
+  const sanInputs = req.body.map((expense) =>
+    Object.fromEntries(
+      Object.entries(expense).map(([k, v]) => [
+        k,
+        Utils.sanitizeString(v as string),
+      ])
+    )
+  );
+
+  const result = await new ExpenseController().createExpenses(sanInputs);
+  res.status(200).json(result);
+  next();
+});
+
 app.get("/health", (req, res, next) => {
   res.status(200).json({ status: "OK", message: "Healthy!" });
 });

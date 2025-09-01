@@ -64,6 +64,53 @@ export class ExpenseModel {
       expense: expenseRecord,
     };
   };
+
+  createExpenses = async (expenses: Expense[]) => {
+    const client = await mongo;
+    const db = client.db("VSLIM");
+
+    // 1. Check if users exist
+    const requestedUserIds = [
+      ...new Set(expenses.map((expense) => new ObjectId(expense.user_id))),
+    ];
+    const users = await db
+      .collection("User")
+      .find({ _id: { $in: requestedUserIds } }, { projection: { name: 1 } })
+      .toArray();
+
+    const existingUserIdsSet = new Set(
+      users.map((user) => user._id.toString())
+    );
+
+    if (existingUserIdsSet.size > requestedUserIds.length) {
+      throw new Error(`User(s) do not exist!`);
+    }
+
+    // 2. Prepare expense records
+    const now = new Date();
+    const expenseRecords: Expense[] = expenses.map((expense) => ({
+      _id: new ObjectId(),
+      user_id: expense.user_id,
+      type: expense.type,
+      description: expense.description,
+      amount: expense.amount,
+      category: expense.category,
+      paid_at: new Date(expense.paid_at),
+      created_at: now,
+      modified_at: now,
+    }));
+
+    // 3. Insert into Expenses collection
+    const result = await db
+      .collection<Expense>("Expense")
+      .insertMany(expenseRecords);
+
+    return {
+      success: true,
+      insertedCount: result.insertedCount,
+      insertedIds: result.insertedIds,
+    };
+  };
 }
 
 export type Expense = {
