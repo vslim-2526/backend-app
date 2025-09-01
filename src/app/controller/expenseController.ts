@@ -43,4 +43,16 @@ export class ExpenseController {
 
     return result;
   };
+
+  updateAnExpense = async (expense_id: string, expenseUpdate: any) => {
+    console.log(`Updating expense ${expense_id} with:`, expenseUpdate);
+    validateCreateAnExpense(expenseUpdate);
+
+    const result = await new ExpenseModel().updateAnExpense(
+      expense_id,
+      expenseUpdate
+    );
+
+    return result;
+  };
 }

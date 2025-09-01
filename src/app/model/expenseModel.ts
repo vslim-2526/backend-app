@@ -111,6 +111,51 @@ export class ExpenseModel {
       insertedIds: result.insertedIds,
     };
   };
+
+  updateAnExpense = async (expense_id: string, expenseUpdate: any) => {
+    const client = await mongo;
+    const db = client.db("VSLIM");
+
+    // 1. Check if expense exists
+    const existingExpense = await db
+      .collection("Expense")
+      .findOne({ _id: new ObjectId(expense_id) });
+
+    if (!existingExpense) {
+      throw new Error(`Expense ${expense_id} not found`);
+    }
+
+    // 2. Prepare update document
+    const updateDoc: any = {
+      ...expenseUpdate,
+      created_at: existingExpense.created_at, // preserve original created_at
+      modified_at: new Date(),
+    };
+
+    delete updateDoc._id; // Ensure _id is not part of the update
+
+    updateDoc.paid_at = new Date(expenseUpdate.paid_at);
+
+    // Verify new user_id exists
+    const userExists = await db
+      .collection("User")
+      .findOne({ _id: new ObjectId(expenseUpdate.user_id) });
+    if (!userExists) {
+      throw new Error("User does not exist");
+    } else {
+      updateDoc.user_id = expenseUpdate.user_id;
+    }
+
+    // 3. Update the expense
+    const result = await db
+      .collection("Expense")
+      .updateOne({ _id: new ObjectId(expense_id) }, { $set: updateDoc });
+
+    return {
+      success: result.modifiedCount === 1,
+      modifiedCount: result.modifiedCount,
+    };
+  };
 }
 
 export type Expense = {

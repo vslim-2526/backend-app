@@ -67,6 +67,23 @@ app.post("/v1/expense/many", async (req, res, next) => {
   next();
 });
 
+app.put("/v1/expense/one/:expense_id", async (req, res, next) => {
+  const sanInput = Object.fromEntries(
+    Object.entries(req.body).map(([k, v]) => [
+      k,
+      Utils.sanitizeString(v as string),
+    ])
+  );
+
+  const result = await new ExpenseController().updateAnExpense(
+    Utils.sanitizeString(req.params.expense_id || ""),
+    sanInput
+  );
+
+  res.status(200).json(result);
+  next();
+});
+
 app.get("/health", (req, res, next) => {
   res.status(200).json({ status: "OK", message: "Healthy!" });
 });
