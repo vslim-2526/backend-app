@@ -17,6 +17,15 @@ export class ExpenseModel {
     return expense;
   };
 
+  getExpenses = async (criteria: any) => {
+    const client = await mongo;
+    const db = client.db("VSLIM");
+
+    const expenses = await db.collection("Expense").find(criteria).toArray();
+
+    return expenses;
+  };
+
   createAnExpense = async (expense) => {
     const client = await mongo;
     const db = client.db("VSLIM");

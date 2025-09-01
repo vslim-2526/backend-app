@@ -31,3 +31,25 @@ export function validateCreateAnExpense(expense: any): string | null {
 
   return null;
 }
+
+export function extractCriteriaForSearch(query: any): any {
+  const criteria: any = {};
+  if (query.user_id) criteria.user_id = String(query.user_id);
+  if (query.type) criteria.type = String(query.type);
+  if (query.description)
+    criteria.description = { $regex: String(query.description), $options: "i" };
+  if (query.amount) criteria.amount = Number(query.amount);
+  if (query.category) criteria.category = String(query.category);
+
+  if (query.paid_after || query.paid_before) {
+    criteria.paid_at = {};
+    if (query.paid_after)
+      criteria.paid_at.$gte = new Date(String(query.paid_after));
+    if (query.paid_before)
+      criteria.paid_at.$lte = new Date(
+        String(`${query.paid_before} 23:59:59Z`)
+      );
+  }
+
+  return criteria;
+}

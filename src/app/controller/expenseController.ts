@@ -9,6 +9,14 @@ export class ExpenseController {
     return result;
   };
 
+  getExpenses = async (criteria: any) => {
+    console.log("Fetching expenses with criteria:", criteria);
+    const result = await new ExpenseModel().getExpenses(criteria);
+
+    console.log("Fetched expenses:", result);
+    return result;
+  };
+
   createAnExpense = async (expense) => {
     console.log("Adding expense:", expense);
     // 1. Basic validation

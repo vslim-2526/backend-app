@@ -28,6 +28,14 @@ app.get("/v1/expense/one/:expense_id", async (req, res, next) => {
   next();
 });
 
+app.get("/v1/expense/many", async (req, res, next) => {
+  const criteria: any = Utils.extractCriteriaForSearch(req.query);
+  const result = await new ExpenseController().getExpenses(criteria);
+
+  res.status(200).json({ result });
+  next();
+});
+
 app.post("/v1/expense/one", async (req, res, next) => {
   const sanInput = Object.fromEntries(
     Object.entries(req.body).map(([k, v]) => [
