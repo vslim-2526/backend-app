@@ -31,7 +31,7 @@ export class ExpenseModel {
     }
 
     // 2. Prepare expense record
-    const now = new Date().toISOString();
+    const now = new Date();
     const expenseRecord: Expense = {
       _id: new ObjectId(),
       user_id: expense.user_id,
@@ -39,7 +39,7 @@ export class ExpenseModel {
       description: expense.description,
       amount: expense.amount,
       category: expense.category,
-      paid_at: expense.paid_at,
+      paid_at: new Date(expense.paid_at),
       created_at: now,
       modified_at: now,
     };
@@ -64,9 +64,9 @@ export type Expense = {
   description: string;
   amount: number;
   category: string;
-  paid_at: string; // ISO date string
-  created_at: string; // ISO date string
-  modified_at: string; // ISO date string
+  paid_at: Date; // ISO date
+  created_at: Date; // ISO date
+  modified_at: Date; // ISO date
 };
 
 export const ExpenseCategory = {

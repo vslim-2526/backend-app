@@ -1,5 +1,5 @@
 import { ExpenseModel } from "../model/expenseModel";
-import { createAnExpenseValidate } from "../utils";
+import { validateCreateAnExpense } from "../utils";
 
 export class ExpenseController {
   getAnExpense = async (expense_id: string) => {
@@ -12,7 +12,7 @@ export class ExpenseController {
   createAnExpense = async (expense) => {
     console.log("Adding expense:", expense);
     // 1. Basic validation
-    createAnExpenseValidate(expense);
+    validateCreateAnExpense(expense);
 
     // 2. Add expense to db
     const result = await new ExpenseModel().createAnExpense(expense);

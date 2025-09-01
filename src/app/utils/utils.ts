@@ -15,7 +15,7 @@ export function sanitizeString(input: string): string {
   return output;
 }
 
-export function createAnExpenseValidate(expense: any): string | null {
+export function validateCreateAnExpense(expense: any): string | null {
   if (!expense.user_id) throw new Error("user_id is required");
   if (!expense.type || !["expense", "income"].includes(expense.type)) {
     throw new Error("type must be either 'expense' or 'income'");
