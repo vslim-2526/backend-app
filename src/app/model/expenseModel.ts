@@ -1,8 +1,32 @@
 import { ObjectId } from "mongodb";
 import mongo from "../globalDbClient/globalDbClient";
-import { createExpenseValidate } from "../utils";
+
 export class ExpenseModel {
-  addExpense = async (expense) => {
+  getAnExpense = async (expense_id: string) => {
+    const client = await mongo;
+    const db = client.db("VSLIM");
+
+    const expense = await db
+      .collection("Expense")
+      .findOne({ _id: new ObjectId(expense_id) });
+
+    if (!expense) {
+      throw new Error(`Expense ${expense_id} not found`);
+    }
+
+    return expense;
+  };
+
+  getExpenses = async (criteria: any) => {
+    const client = await mongo;
+    const db = client.db("VSLIM");
+
+    const expenses = await db.collection("Expense").find(criteria).toArray();
+
+    return expenses;
+  };
+
+  createAnExpense = async (expense) => {
     const client = await mongo;
     const db = client.db("VSLIM");
 
@@ -16,15 +40,15 @@ export class ExpenseModel {
     }
 
     // 2. Prepare expense record
-    const now = new Date().toISOString();
+    const now = new Date();
     const expenseRecord: Expense = {
-      _id: new ObjectId().toString(),
+      _id: new ObjectId(),
       user_id: expense.user_id,
       type: expense.type,
       description: expense.description,
       amount: expense.amount,
       category: expense.category,
-      paid_at: expense.paid_at,
+      paid_at: new Date(expense.paid_at),
       created_at: now,
       modified_at: now,
     };
@@ -43,15 +67,15 @@ export class ExpenseModel {
 }
 
 export type Expense = {
-  _id: string;
+  _id: ObjectId;
   user_id: string; // Reference to the user who created the expense
   type: "expense" | "income";
   description: string;
   amount: number;
   category: string;
-  paid_at: string; // ISO date string
-  created_at: string; // ISO date string
-  modified_at: string; // ISO date string
+  paid_at: Date; // ISO date
+  created_at: Date; // ISO date
+  modified_at: Date; // ISO date
 };
 
 export const ExpenseCategory = {

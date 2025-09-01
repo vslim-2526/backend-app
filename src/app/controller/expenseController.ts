@@ -1,14 +1,29 @@
 import { ExpenseModel } from "../model/expenseModel";
-import { createExpenseValidate } from "../utils";
+import { validateCreateAnExpense } from "../utils";
 
 export class ExpenseController {
-  addExpense = async (expense) => {
+  getAnExpense = async (expense_id: string) => {
+    console.log("Fetching expense with ID:", expense_id);
+    const result = await new ExpenseModel().getAnExpense(expense_id);
+
+    return result;
+  };
+
+  getExpenses = async (criteria: any) => {
+    console.log("Fetching expenses with criteria:", criteria);
+    const result = await new ExpenseModel().getExpenses(criteria);
+
+    console.log("Fetched expenses:", result);
+    return result;
+  };
+
+  createAnExpense = async (expense) => {
     console.log("Adding expense:", expense);
     // 1. Basic validation
-    createExpenseValidate(expense);
+    validateCreateAnExpense(expense);
 
     // 2. Add expense to db
-    const result = await new ExpenseModel().addExpense(expense);
+    const result = await new ExpenseModel().createAnExpense(expense);
 
     return result;
   };
