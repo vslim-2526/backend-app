@@ -17,13 +17,37 @@ export class ExpenseController {
     return result;
   };
 
-  createAnExpense = async (expense) => {
-    console.log("Adding expense:", expense);
-    // 1. Basic validation
-    validateCreateAnExpense(expense);
+  createExpenses = async (expenses: any[]) => {
+    console.log("Adding multiple expenses:", expenses);
+    const results = [];
 
-    // 2. Add expense to db
-    const result = await new ExpenseModel().createAnExpense(expense);
+    for (const [idx, expense] of expenses.entries()) {
+      try {
+        validateCreateAnExpense(expense);
+      } catch (error) {
+        throw new Error(
+          `Validation failed for expense at index ${idx}: ${error}`
+        );
+      }
+    }
+    const result = await new ExpenseModel().createExpenses(expenses);
+
+    return result;
+  };
+
+  updateExpenses = async (expenseUpdates: any) => {
+    console.log("Updating multiple expenses:", expenseUpdates);
+    for (const [idx, expense] of expenseUpdates.entries()) {
+      try {
+        validateCreateAnExpense(expense);
+      } catch (error) {
+        throw new Error(
+          `Validation failed for expense at index ${idx}: ${error}`
+        );
+      }
+    }
+
+    const result = await new ExpenseModel().updateExpenses(expenseUpdates);
 
     return result;
   };

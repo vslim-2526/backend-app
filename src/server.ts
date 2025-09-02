@@ -29,22 +29,53 @@ app.get("/v1/expense/one/:expense_id", async (req, res, next) => {
 });
 
 app.get("/v1/expense/many", async (req, res, next) => {
-  const criteria: any = Utils.extractCriteriaForSearch(req.query);
+  const sanInput = Object.fromEntries(
+    Object.entries(req.query).map(([k, v]) => [
+      k,
+      Utils.sanitizeString(v as string),
+    ])
+  );
+
+  const criteria: any = Utils.extractCriteriaForSearch(sanInput);
   const result = await new ExpenseController().getExpenses(criteria);
 
   res.status(200).json({ result });
   next();
 });
 
-app.post("/v1/expense/one", async (req, res, next) => {
-  const sanInput = Object.fromEntries(
-    Object.entries(req.body).map(([k, v]) => [
-      k,
-      Utils.sanitizeString(v as string),
-    ])
+app.post("/v1/expense", async (req, res, next) => {
+  if (!Array.isArray(req.body)) {
+    return res.status(400).json({ error: "Request body must be an array" });
+  }
+  const sanInputs = req.body.map((expense) =>
+    Object.fromEntries(
+      Object.entries(expense).map(([k, v]) => [
+        k,
+        Utils.sanitizeString(v as string),
+      ])
+    )
   );
 
-  const result = await new ExpenseController().createAnExpense(sanInput);
+  const result = await new ExpenseController().createExpenses(sanInputs);
+  res.status(200).json(result);
+  next();
+});
+
+app.put("/v1/expense", async (req, res, next) => {
+  if (!Array.isArray(req.body)) {
+    return res.status(400).json({ error: "Request body must be an array" });
+  }
+
+  const sanInputs = req.body.map((expense) =>
+    Object.fromEntries(
+      Object.entries(expense).map(([k, v]) => [
+        k,
+        Utils.sanitizeString(v as string),
+      ])
+    )
+  );
+
+  const result = await new ExpenseController().updateExpenses(sanInputs);
   res.status(200).json(result);
   next();
 });
