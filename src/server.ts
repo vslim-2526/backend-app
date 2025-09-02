@@ -29,12 +29,7 @@ app.get("/v1/expense/one/:expense_id", async (req, res, next) => {
 });
 
 app.get("/v1/expense/many", async (req, res, next) => {
-  const sanInput = Object.fromEntries(
-    Object.entries(req.query).map(([k, v]) => [
-      k,
-      Utils.sanitizeString(v as string),
-    ])
-  );
+  const sanInput = Utils.sanitizeObject(req.query);
 
   const criteria: any = Utils.extractCriteriaForSearch(sanInput);
   const result = await new ExpenseController().getExpenses(criteria);
@@ -47,14 +42,7 @@ app.post("/v1/expense", async (req, res, next) => {
   if (!Array.isArray(req.body)) {
     return res.status(400).json({ error: "Request body must be an array" });
   }
-  const sanInputs = req.body.map((expense) =>
-    Object.fromEntries(
-      Object.entries(expense).map(([k, v]) => [
-        k,
-        Utils.sanitizeString(v as string),
-      ])
-    )
-  );
+  const sanInputs = req.body.map((expense) => Utils.sanitizeObject(expense));
 
   const result = await new ExpenseController().createExpenses(sanInputs);
   res.status(200).json(result);
@@ -66,16 +54,28 @@ app.put("/v1/expense", async (req, res, next) => {
     return res.status(400).json({ error: "Request body must be an array" });
   }
 
-  const sanInputs = req.body.map((expense) =>
-    Object.fromEntries(
-      Object.entries(expense).map(([k, v]) => [
-        k,
-        Utils.sanitizeString(v as string),
-      ])
-    )
-  );
+  const sanInputs = req.body.map((expense) => Utils.sanitizeObject(expense));
 
   const result = await new ExpenseController().updateExpenses(sanInputs);
+  res.status(200).json(result);
+  next();
+});
+
+app.delete("/v1/expense", async (req, res, next) => {
+  const sanIds = req.body.deleted_ids.map((id: string) =>
+    Utils.sanitizeString(id)
+  );
+
+  const result = await new ExpenseController().deleteExpenses(sanIds);
+  res.status(200).json(result);
+  next();
+});
+
+app.get("/v1/statistics", async (req, res, next) => {
+  const sanInput = Utils.sanitizeObject(req.query);
+
+  const criteria: any = Utils.extractCriteriaForSearch(sanInput);
+  const result = await new ExpenseController().getStatistics(criteria);
   res.status(200).json(result);
   next();
 });

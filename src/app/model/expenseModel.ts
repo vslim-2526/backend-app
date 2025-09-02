@@ -220,6 +220,57 @@ export class ExpenseModel {
       modifiedCount: result.modifiedCount,
     };
   };
+
+  deleteExpenses = async (expense_ids: string[]) => {
+    const client = await mongo;
+    const db = client.db("VSLIM");
+
+    const objectIds = expense_ids.map((id) => new ObjectId(id));
+
+    const result = await db
+      .collection("Expense")
+      .deleteMany({ _id: { $in: objectIds } });
+
+    return {
+      success: result.deletedCount === expense_ids.length,
+      deletedCount: result.deletedCount,
+    };
+  };
+
+  getStatistics = async (criteria) => {
+    const client = await mongo;
+    const db = client.db("VSLIM");
+
+    const stats = await db
+      .collection("Expense")
+      .aggregate([
+        {
+          $match: {
+            paid_at: {
+              $gte: criteria.paid_at.$gte, // start date
+              $lte: criteria.paid_at.$lte, // end date
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$category",
+            totalAmount: { $sum: { $toInt: "$amount" } },
+            count: { $sum: 1 },
+          },
+        },
+      ])
+      .toArray();
+
+    const formattedStats: any = {};
+    stats.forEach((stat) => {
+      formattedStats[stat._id] = {
+        totalAmount: stat.totalAmount,
+        count: stat.count,
+      };
+    });
+    return formattedStats;
+  };
 }
 
 export type Expense = {

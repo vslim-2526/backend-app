@@ -17,6 +17,12 @@ export function sanitizeString(input: string): string {
   return output;
 }
 
+export function sanitizeObject(obj: any): any {
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [k, sanitizeString(v as string)])
+  );
+}
+
 export function validateCreateAnExpense(expense: any): string | null {
   if (!expense.user_id) throw new Error("user_id is required");
   if (!expense.type || !["expense", "income"].includes(expense.type)) {
