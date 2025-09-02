@@ -48,6 +48,12 @@ export class ExpenseController {
     }
 
     const result = await new ExpenseModel().updateExpenses(expenseUpdates);
+    return result;
+  };
+
+  deleteExpenses = async (expense_ids: string[]) => {
+    console.log("Deleting multiple expenses:", expense_ids);
+    const result = await new ExpenseModel().deleteExpenses(expense_ids);
 
     return result;
   };

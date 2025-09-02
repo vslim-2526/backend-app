@@ -80,6 +80,16 @@ app.put("/v1/expense", async (req, res, next) => {
   next();
 });
 
+app.delete("/v1/expense", async (req, res, next) => {
+  const sanIds = req.body.deleted_ids.map((id: string) =>
+    Utils.sanitizeString(id)
+  );
+
+  const result = await new ExpenseController().deleteExpenses(sanIds);
+  res.status(200).json(result);
+  next();
+});
+
 app.get("/health", (req, res, next) => {
   res.status(200).json({ status: "OK", message: "Healthy!" });
 });

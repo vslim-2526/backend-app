@@ -220,6 +220,22 @@ export class ExpenseModel {
       modifiedCount: result.modifiedCount,
     };
   };
+
+  deleteExpenses = async (expense_ids: string[]) => {
+    const client = await mongo;
+    const db = client.db("VSLIM");
+
+    const objectIds = expense_ids.map((id) => new ObjectId(id));
+
+    const result = await db
+      .collection("Expense")
+      .deleteMany({ _id: { $in: objectIds } });
+
+    return {
+      success: result.deletedCount === expense_ids.length,
+      deletedCount: result.deletedCount,
+    };
+  };
 }
 
 export type Expense = {
