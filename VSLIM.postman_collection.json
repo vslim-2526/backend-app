@@ -145,12 +145,67 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "DELETE expenses",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"deleted_ids\": [\r\n        \"68b41195e78fc4f3dbc8957e\",\r\n        \"68b411d7401840caafdd0a14\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/expense",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"expense"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET the Statistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/v1/statistics?paid_after=2025-08-31&paid_before=2025-09-03",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"statistics"
+					],
+					"query": [
+						{
+							"key": "paid_after",
+							"value": "2025-08-31"
+						},
+						{
+							"key": "paid_before",
+							"value": "2025-09-03"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
 		{
 			"key": "baseURL",
-			"value": "",
+			"value": "localhost:8000",
 			"type": "default"
 		}
 	]
