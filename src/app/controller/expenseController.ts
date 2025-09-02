@@ -57,4 +57,11 @@ export class ExpenseController {
 
     return result;
   };
+
+  getStatistics = async (criteria: any) => {
+    console.log("Calculating statistics");
+    const result = await new ExpenseModel().getStatistics(criteria);
+
+    return result;
+  };
 }

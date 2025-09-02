@@ -71,6 +71,15 @@ app.delete("/v1/expense", async (req, res, next) => {
   next();
 });
 
+app.get("/v1/statistics", async (req, res, next) => {
+  const sanInput = Utils.sanitizeObject(req.query);
+
+  const criteria: any = Utils.extractCriteriaForSearch(sanInput);
+  const result = await new ExpenseController().getStatistics(criteria);
+  res.status(200).json(result);
+  next();
+});
+
 app.get("/health", (req, res, next) => {
   res.status(200).json({ status: "OK", message: "Healthy!" });
 });
