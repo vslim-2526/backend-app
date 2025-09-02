@@ -117,6 +117,8 @@ export class ExpenseModel {
     };
   };
 
+  // TO-DO: IF NOT USING BY 16 SEP 2025, DELETE THIS COMMENTED CODE!
+
   // updateAnExpense = async (expense_id: string, expenseUpdate: any) => {
   //   const client = await mongo;
   //   const db = client.db("VSLIM");
