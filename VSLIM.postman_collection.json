@@ -1,0 +1,157 @@
+{
+	"info": {
+		"_postman_id": "47c9f58a-3ff9-4bf7-9c2d-41926a64d9b7",
+		"name": "VSLIM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26162638"
+	},
+	"item": [
+		{
+			"name": "GET health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/health",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET an expense",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/v1/expense/one/68b5b2b391e017f34c60bfd7",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"expense",
+						"one",
+						"68b5b2b391e017f34c60bfd7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET many expenses",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/v1/expense/many",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"expense",
+						"many"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "68b3d1ae0be9bb8228499d9f",
+							"disabled": true
+						},
+						{
+							"key": "paid_after",
+							"value": "2025-09-01",
+							"disabled": true
+						},
+						{
+							"key": "paid_before",
+							"value": "2025-09-01",
+							"disabled": true
+						},
+						{
+							"key": "type",
+							"value": "expense",
+							"disabled": true
+						},
+						{
+							"key": "_ids",
+							"value": "68b5b2b391e017f34c60bfd7,68b5b2b391e017f34c60bfd2,68b5b2b391e017f34c60bfdd",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE new expenses",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"_id\": \"68b3d6b072275996066b78cb\",\r\n        \"user_id\": \"68b3d1ae0be9bb8228499d9f\",\r\n        \"type\": \"expense\",\r\n        \"description\": \"TEST Create 1\",\r\n        \"amount\": \"5000\",\r\n        \"category\": \"Ăn uống\",\r\n        \"paid_at\": \"2025-08-31T04:45:35.400Z\"\r\n    },\r\n    {\r\n        \"_id\": \"68b3d6b072275996066b78cb\",\r\n        \"user_id\": \"68b3d1ae0be9bb8228499d9f\",\r\n        \"type\": \"expense\",\r\n        \"description\": \"TEST Create 2\",\r\n        \"amount\": \"6000\",\r\n        \"category\": \"Ăn uống\",\r\n        \"paid_at\": \"2025-08-31T04:45:35.400Z\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/expense",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"expense"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE an expense",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"_id\": \"68b5b2b391e017f34c60bfd7\",\r\n        \"user_id\": \"68b3d1ae0be9bb8228499d9f\",\r\n        \"type\": \"expense\",\r\n        \"description\": \"TEST PUT Update\",\r\n        \"amount\": \"46000\",\r\n        \"category\": \"Ăn uống\",\r\n        \"paid_at\": \"2025-08-31T04:45:35.400Z\",\r\n        \"created_at\": \"2025-09-01T14:50:27.536Z\",\r\n        \"modified_at\": \"2025-09-01T15:21:50.368Z\"\r\n    },\r\n    {\r\n        \"_id\": \"68b412663e9e7a80b91f0cd3\",\r\n        \"user_id\": \"68b3d1ae0be9bb8228499d9f\",\r\n        \"type\": \"expense\",\r\n        \"description\": \"Uống nước ngọt test update\",\r\n        \"amount\": \"35000\",\r\n        \"category\": \"Ăn uống\",\r\n        \"paid_at\": \"2025-08-31T04:45:35.400Z\",\r\n        \"created_at\": \"2025-08-31T09:14:14.558Z\",\r\n        \"modified_at\": \"2025-08-31T09:14:14.558Z\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/expense",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"expense"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
