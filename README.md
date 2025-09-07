@@ -9,7 +9,7 @@ Release are for the official versions, like `1.0.1`. Follow these steps:
 2. Checkout to a new branch of `release/<version>`, eg. **release/1.0.1**
 3. Update version in `package.json`, eg. **1.0.1**.
 4. Commit that, then create lightweight tag for the code with `git tag <version>`, eg. **git tag 1.0.1**.
-5. From CLI, run `docker build -t vslim/backend-app:<version>  -t vslim/backend-app:latest .` (notice the last dot). This will create 2 images: **vslim/backend-app:\<version\>** and **vslim/backend-app:latest**.
+5. From CLI, run `docker build -t dongphong543/vslim-backend-app:<version>  -t dongphong543/vslim-backend-app:latest .` (notice the last dot). This will create 2 images: **dongphong543/vslim-backend-app:\<version\>** and **dongphong543/vslim-backend-app:latest**.
 6. Push these 2 images to our Docker Hub repository.
 7. Once done, push branch `release/<version>` to Github with `--tags` option, PR to branch `main`, and get it merge.
 
@@ -20,6 +20,6 @@ Release are for the testing, aka _release candidate_, versions, like `1.0.1-rc.3
 0. Checkout to a new branch of `prerelease/<future-version>-rc.<number>` from the branch of code you want to test, eg. **prerelease/1.0.1-rc.3**, as prerelease-version = 1.0.1-rc.3.
 3. Update version in `package.json`, eg. **1.0.1-rc.3**.
 4. Commit that, then create lightweight tag for the code with `git tag <prerelease-version>`, eg. **git tag 1.0.1-rc.3**.
-5. From CLI, run `docker build -t vslim/backend-app:<prerelease-version> .` (notice the last dot). This will create 1 image: **vslim/backend-app:\<prerelease-version\>**.
+5. From CLI, run `docker build -t dongphong543/vslim-backend-app:<prerelease-version> .` (notice the last dot). This will create 1 image: **dongphong543/vslim-backend-app:\<prerelease-version\>**.
 6. Push this image to our Docker Hub repository.
 7. Once done, push branch `prerelease/<future-version>-rc.<number>` to Github with `--tags` option, and _leave it there_.
