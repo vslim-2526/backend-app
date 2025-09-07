@@ -17,9 +17,9 @@ Release are for the official versions, like `1.0.1`. Follow these steps:
 
 Release are for the testing, aka _release candidate_, versions, like `1.0.1-rc.3`. Follow these steps:
 
-0. Checkout to a new branch of `prerelease/<future-version>-rc.<number>` from the branch of code you want to test, eg. **prerelease/1.0.1-rc.3**
+0. Checkout to a new branch of `prerelease/<future-version>-rc.<number>` from the branch of code you want to test, eg. **prerelease/1.0.1-rc.3**, as prerelease-version = 1.0.1-rc.3.
 3. Update version in `package.json`, eg. **1.0.1-rc.3**.
-4. Commit that, then create lightweight tag for the code with `git tag <version>`, eg. **git tag 1.0.1-rc.3**.
-5. From CLI, run `docker build -t vslim/backend-app:<version> .` (notice the last dot). This will create 1 image: **vslim/backend-app:<future-version>-rc.<number>**.
+4. Commit that, then create lightweight tag for the code with `git tag <prerelease-version>`, eg. **git tag 1.0.1-rc.3**.
+5. From CLI, run `docker build -t vslim/backend-app:<prerelease-version> .` (notice the last dot). This will create 1 image: **vslim/backend-app:\<prerelease-version\>**.
 6. Push this image to our Docker Hub repository.
 7. Once done, push branch `prerelease/<future-version>-rc.<number>` to Github with `--tags` option, and _leave it there_.
