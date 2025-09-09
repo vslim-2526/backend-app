@@ -23,3 +23,8 @@ Release are for the testing, aka _release candidate_, versions, like `1.0.1-rc.3
 5. From CLI, run `docker build -t dongphong543/vslim-backend-app:<prerelease-version> .` (notice the last dot). This will create 1 image: **dongphong543/vslim-backend-app:\<prerelease-version\>**.
 6. Push this image to our Docker Hub repository.
 7. Once done, push branch `prerelease/<future-version>-rc.<number>` to Github with `--tags` option, and _leave it there_.
+
+## Deploy process ↗️
+1. Access Lambda function of `vslim-deploy-image-function` with your IAM account.
+2. Trigger ("Test") the function with event template `vslim-deploy-triggerer`. image_tag = your version, eg. 1.0.1, or 1.0.1-rc.
+3. Wait, then check if `status = Success`. If so, then congrats, your version is deployed to production! 😀
