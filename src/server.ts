@@ -80,6 +80,13 @@ app.get("/v1/statistics", async (req, res, next) => {
   next();
 });
 
+app.post("/v1/test/date", async (req, res, next) => {
+  const result = await Utils.parseDateRange(req.body.text as string);
+
+  res.status(200).json(result);
+  next();
+});
+
 app.get("/health", (req, res, next) => {
   res.status(200).json({ status: "OK", message: "Healthy!" });
 });
