@@ -99,7 +99,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "[\r\n    {\r\n        \"_id\": \"68b3d6b072275996066b78cb\",\r\n        \"user_id\": \"68b3d1ae0be9bb8228499d9f\",\r\n        \"type\": \"expense\",\r\n        \"description\": \"TEST Create 1\",\r\n        \"amount\": \"5000\",\r\n        \"category\": \"Ăn uống\",\r\n        \"paid_at\": \"2025-08-31T04:45:35.400Z\"\r\n    },\r\n    {\r\n        \"_id\": \"68b3d6b072275996066b78cb\",\r\n        \"user_id\": \"68b3d1ae0be9bb8228499d9f\",\r\n        \"type\": \"expense\",\r\n        \"description\": \"TEST Create 2\",\r\n        \"amount\": \"6000\",\r\n        \"category\": \"Ăn uống\",\r\n        \"paid_at\": \"2025-08-31T04:45:35.400Z\"\r\n    }\r\n]",
+					"raw": "[\r\n    {\r\n        \"_id\": \"68b3d6b072275996066b78cb\",\r\n        \"user_id\": \"68b3d1ae0be9bb8228499d9f\",\r\n        \"type\": \"expense\",\r\n        \"description\": \"TEST Docker\",\r\n        \"amount\": \"5000\",\r\n        \"category\": \"Ăn uống\",\r\n        \"paid_at\": \"2025-09-07T04:05:35.400Z\"\r\n    },\r\n    {\r\n        \"_id\": \"68b3d6b072275996066b78cb\",\r\n        \"user_id\": \"68b3d1ae0be9bb8228499d9f\",\r\n        \"type\": \"expense\",\r\n        \"description\": \"TEST Create 2\",\r\n        \"amount\": \"6000\",\r\n        \"category\": \"Ăn uống\",\r\n        \"paid_at\": \"2025-08-31T04:45:35.400Z\"\r\n    }\r\n]",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -196,6 +196,87 @@
 							"key": "paid_before",
 							"value": "2025-09-03"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST convert Price (test)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"text\": \"hai bãy ngàn\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/test/price",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"test",
+						"price"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[Cloud] GET an expense",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://ec2-47-130-157-224.ap-southeast-1.compute.amazonaws.com/v1/expense/one/68b5b2b391e017f34c60bfd7",
+					"protocol": "http",
+					"host": [
+						"ec2-47-130-157-224",
+						"ap-southeast-1",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"v1",
+						"expense",
+						"one",
+						"68b5b2b391e017f34c60bfd7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST convert Date (test)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"text\": \"17 thg 05\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/test/date",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"test",
+						"date"
 					]
 				}
 			},
