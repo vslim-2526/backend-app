@@ -423,6 +423,7 @@ function matchParseDate(text, _) {
 }
 
 export function parseDateRange(text) {
+  console.log("Parsing date:", text);
   const today = DateTime.now().startOf("day");
   text = normalizeDateRange(text);
 

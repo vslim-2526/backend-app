@@ -6,7 +6,7 @@
     "moduleResolution": "NodeNext",
     "pretty": true,
     "sourceMap": true,
-    "target": "es6",
+    "target": "es2018",
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {},
