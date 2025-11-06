@@ -14,9 +14,12 @@ app.use(cors({ origin: "*" }));
 
 // app.use(Middlewares.disableCors);
 
-app.use("/v1/chat", (req, res, next) => {
+app.post("/v1/chat", async (req, res, next) => {
   const sanInput = Utils.sanitizeString(req.body.utterance || "");
-  const chatController = new ChatController();
+  const sanUserId = Utils.sanitizeString(req.query.user_id || "");
+  const result = await new ChatController().handleChat(sanUserId, sanInput);
+
+  res.status(200).json(result);
   next();
 });
 
