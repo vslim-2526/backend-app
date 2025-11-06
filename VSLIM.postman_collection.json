@@ -230,31 +230,6 @@
 			"response": []
 		},
 		{
-			"name": "[Cloud] GET an expense",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://ec2-47-130-157-224.ap-southeast-1.compute.amazonaws.com/v1/expense/one/68b5b2b391e017f34c60bfd7",
-					"protocol": "http",
-					"host": [
-						"ec2-47-130-157-224",
-						"ap-southeast-1",
-						"compute",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"v1",
-						"expense",
-						"one",
-						"68b5b2b391e017f34c60bfd7"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "POST convert Date (test)",
 			"request": {
 				"method": "POST",
@@ -281,6 +256,198 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "POST chat",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"utterance\": \"ngày mai đổ xăng etest 20k, xóa giao dịch Docker ngày 7 tháng 9, thống kê chi tiêu toàn tháng \"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/chat?user_id=68b3d1ae0be9bb8228499d9f",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"chat"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "68b3d1ae0be9bb8228499d9f"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[Cloud] GET an expense",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://ec2-47-130-157-224.ap-southeast-1.compute.amazonaws.com/v1/expense/one/68b5b2b391e017f34c60bfd7",
+					"protocol": "http",
+					"host": [
+						"ec2-47-130-157-224",
+						"ap-southeast-1",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"v1",
+						"expense",
+						"one",
+						"68b5b2b391e017f34c60bfd7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[Cloud] GET health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://ec2-47-130-157-224.ap-southeast-1.compute.amazonaws.com/health",
+					"protocol": "http",
+					"host": [
+						"ec2-47-130-157-224",
+						"ap-southeast-1",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[Cloud] POST chat",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"utterance\": \"ngày mai đổ xăng pama 20k, xóa giao dịch etest ngày mai\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://ec2-47-130-157-224.ap-southeast-1.compute.amazonaws.com/v1/chat?user_id=68b3d1ae0be9bb8228499d9f",
+					"protocol": "http",
+					"host": [
+						"ec2-47-130-157-224",
+						"ap-southeast-1",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"v1",
+						"chat"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "68b3d1ae0be9bb8228499d9f"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[VSLIM] GET health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://unwormy-heteronomously-adalberto.ngrok-free.dev/health",
+					"protocol": "https",
+					"host": [
+						"unwormy-heteronomously-adalberto",
+						"ngrok-free",
+						"dev"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[VSLIM] POST predict",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"utterance\": \"chỉnh ăn đám hỏi tuần trước 25k thành 40k, thêm ăn sáng\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://unwormy-heteronomously-adalberto.ngrok-free.dev/parse",
+					"protocol": "https",
+					"host": [
+						"unwormy-heteronomously-adalberto",
+						"ngrok-free",
+						"dev"
+					],
+					"path": [
+						"parse"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	],
 	"variable": [
