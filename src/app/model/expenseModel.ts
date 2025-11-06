@@ -1,5 +1,5 @@
 import { BulkWriteResult, ObjectId } from "mongodb";
-import mongo from "../globalDbClient/globalDbClient";
+import { mongo } from "../globalClient";
 
 export class ExpenseModel {
   getAnExpense = async (expense_id: string) => {
@@ -46,7 +46,7 @@ export class ExpenseModel {
       user_id: expense.user_id,
       type: expense.type,
       description: expense.description,
-      amount: expense.amount,
+      price: expense.price,
       category: expense.category,
       paid_at: new Date(expense.paid_at),
       created_at: now,
@@ -73,11 +73,21 @@ export class ExpenseModel {
     const requestedUserIds = [
       ...new Set(expenses.map((expense) => expense.user_id)),
     ];
+    const userObjectIds = requestedUserIds
+      .map((e) => {
+        try {
+          return new ObjectId(e as string);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean) as ObjectId[];
+
     const users = await db
       .collection("User")
       .find(
         {
-          _id: { $in: requestedUserIds.map((e) => new ObjectId(e as string)) },
+          _id: { $in: userObjectIds },
         },
         { projection: { name: 1 } }
       )
@@ -98,7 +108,7 @@ export class ExpenseModel {
       user_id: expense.user_id,
       type: expense.type,
       description: expense.description,
-      amount: expense.amount,
+      price: expense.price,
       category: expense.category,
       paid_at: new Date(expense.paid_at),
       created_at: now,
@@ -116,53 +126,6 @@ export class ExpenseModel {
       insertedIds: result.insertedIds,
     };
   };
-
-  // TO-DO: IF NOT USING BY 16 SEP 2025, DELETE THIS COMMENTED CODE!
-
-  // updateAnExpense = async (expense_id: string, expenseUpdate: any) => {
-  //   const client = await mongo;
-  //   const db = client.db("VSLIM");
-
-  //   // 1. Check if expense exists
-  //   const existingExpense = await db
-  //     .collection("Expense")
-  //     .findOne({ _id: new ObjectId(expense_id) });
-
-  //   if (!existingExpense) {
-  //     throw new Error(`Expense ${expense_id} not found`);
-  //   }
-
-  //   // 2. Prepare update document
-  //   const updateDoc: any = {
-  //     ...expenseUpdate,
-  //     created_at: existingExpense.created_at, // preserve original created_at
-  //     modified_at: new Date(),
-  //   };
-
-  //   delete updateDoc._id; // Ensure _id is not part of the update
-
-  //   updateDoc.paid_at = new Date(expenseUpdate.paid_at);
-
-  //   // Verify new user_id exists
-  //   const userExists = await db
-  //     .collection("User")
-  //     .findOne({ _id: new ObjectId(expenseUpdate.user_id) });
-  //   if (!userExists) {
-  //     throw new Error("User does not exist");
-  //   } else {
-  //     updateDoc.user_id = expenseUpdate.user_id;
-  //   }
-
-  //   // 3. Update the expense
-  //   const result = await db
-  //     .collection("Expense")
-  //     .updateOne({ _id: new ObjectId(expense_id) }, { $set: updateDoc });
-
-  //   return {
-  //     success: result.modifiedCount === 1,
-  //     modifiedCount: result.modifiedCount,
-  //   };
-  // };
 
   updateExpenses = async (expenseUpdates: any) => {
     const client = await mongo;
@@ -198,7 +161,7 @@ export class ExpenseModel {
       user_id: expense.user_id,
       type: expense.type,
       description: expense.description,
-      amount: expense.amount,
+      price: expense.price,
       category: expense.category,
       paid_at: new Date(expense.paid_at),
       created_at: expense.created_at,
@@ -274,11 +237,11 @@ export class ExpenseModel {
 }
 
 export type Expense = {
-  _id: ObjectId;
+  _id?: ObjectId;
   user_id: string; // Reference to the user who created the expense
   type: "expense" | "income";
   description: string;
-  amount: number;
+  price: number;
   category: string;
   paid_at: Date; // ISO date
   created_at: Date; // ISO date
