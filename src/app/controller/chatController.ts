@@ -32,7 +32,7 @@ export class ChatController {
       unfilledFrames
     );
 
-    const ret = this.executeFrames(userId, doableFrames);
+    const ret = await this.executeFrames(userId, doableFrames);
 
     // Save incompleteFrames to cache and generate message asking for more info
     let message = null;
@@ -44,7 +44,7 @@ export class ChatController {
       cache.del(cacheKey);
     }
 
-    return { doableFrames, incompleteFrames, message };
+    return { doableFrames, incompleteFrames, message, ret };
   }
 
   groupFrameByActions(
@@ -161,8 +161,18 @@ export class ChatController {
     const expenseModel = new ExpenseModel();
 
     // Spread frames by date range into one frame per day with Date objects
+    // Exception: search_expense and stat_expense don't spread, keep date range as criteria
     const spreadedFrames: ExpenseFrame[] = [];
     for (const frame of frames) {
+      // Don't spread search_expense and stat_expense - they use date ranges in criteria
+      if (
+        frame.intent === "search_expense" ||
+        frame.intent === "stat_expense"
+      ) {
+        spreadedFrames.push(frame);
+        continue;
+      }
+
       const dateKeys = ["condition_date", "target_date", "date"];
       const foundKey = dateKeys.find((k) => frame[k]);
       if (!foundKey) {

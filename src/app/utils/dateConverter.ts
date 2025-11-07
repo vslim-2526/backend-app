@@ -332,7 +332,7 @@ function parseDate(text) {
 }
 
 const rangeVariants = {
-  h: "nay",
+  "h ": "nay",
   giờ: "nay",
   khoảng: "",
   trong: "",
