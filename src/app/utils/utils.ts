@@ -223,16 +223,46 @@ export function frameToCriteria(userId: string, frame: ExpenseFrame): any {
     criteria.category = category;
   }
   if (date) {
-    const dateObj = new Date(date);
-    // Match expenses on the same day
-    const startOfDay = new Date(dateObj);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(dateObj);
-    endOfDay.setHours(23, 59, 59, 999);
-    criteria.paid_at = {
-      $gte: startOfDay,
-      $lte: endOfDay,
-    };
+    // For search_expense, handle date ranges
+    if (frame.intent === "search_expense" && typeof date === "string") {
+      const range = require("./dateConverter").parseDateRange(date);
+      if (range) {
+        const start = new Date(range.start + "T00:00:00Z");
+        const end = new Date(range.end + "T23:59:59.999Z");
+        criteria.paid_at = {
+          $gte: start,
+          $lte: end,
+        };
+      } else {
+        // Fallback to single date handling
+        const dateObj = new Date(date);
+        const startOfDay = new Date(dateObj);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(dateObj);
+        endOfDay.setHours(23, 59, 59, 999);
+        criteria.paid_at = {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        };
+      }
+    } else {
+      // For other intents or Date objects, match expenses on the same day
+      if (!date) return criteria;
+      // date is string | number | Date at this point (not null after check)
+
+      const dateObj =
+        typeof date === "object" && (date as any).constructor === Date
+          ? date
+          : new Date(date);
+      const startOfDay = new Date(dateObj);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(dateObj);
+      endOfDay.setHours(23, 59, 59, 999);
+      criteria.paid_at = {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      };
+    }
   }
 
   return criteria;
@@ -289,9 +319,29 @@ export function frameToStatisticsCriteria(
     user_id: userId,
   };
 
+  // Check for date range string first (for stat_expense)
+  if (frame.date && typeof frame.date === "string") {
+    const range = require("./dateConverter").parseDateRange(frame.date);
+    if (range) {
+      // Date range provided
+      const start = new Date(range.start + "T00:00:00Z");
+      const end = new Date(range.end + "T23:59:59.999Z");
+      criteria.paid_at = {
+        $gte: start,
+        $lte: end,
+      };
+      return criteria;
+    }
+  }
+
   if (frame.date) {
-    // If single date, use it as both start and end
-    const date = new Date(frame.date);
+    // If single date (Date object or ISO string), use it as both start and end
+    const date =
+      frame.date &&
+      typeof frame.date === "object" &&
+      frame.date.constructor === Date
+        ? (frame.date as Date)
+        : new Date(frame.date as string | number);
     criteria.paid_at = {
       $gte: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
       $lte: new Date(
@@ -305,7 +355,7 @@ export function frameToStatisticsCriteria(
       ),
     };
   } else if (frame.date_start && frame.date_end) {
-    // Date range provided
+    // Date range provided via explicit fields
     criteria.paid_at = {
       $gte: new Date(frame.date_start),
       $lte: new Date(frame.date_end),
