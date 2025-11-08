@@ -41,8 +41,8 @@ export class LlmModel {
   }
 
   async detectCategories(descriptions: string[]) {
-    await new Promise((r) => setTimeout(r, 100));
-    return ["Ăn uống"];
+    await new Promise((r) => setTimeout(r, 10));
+    return [];
   }
 }
 

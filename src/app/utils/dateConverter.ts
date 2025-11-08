@@ -78,6 +78,7 @@ const testCases = [
 // -------------------------------
 const variants = {
   hnay: "hôm nay",
+  "hôm ngày": "ngày",
   hqua: "hôm qua",
   hkia: "hôm kia",
   nmai: "ngày mai",
@@ -394,7 +395,7 @@ function matchFromTo(text, today) {
 
 function matchNumericRange(text, today) {
   const m = text.match(
-    /^(\d*)\s*(ngày|tuần|tháng|năm)\s+(tới|nay|qua|vừa qua|gần đây|vừa rồi|gần nhất)$/
+    /^(\d*)\s*(ngày|tuần|tháng|năm)\s*(tới|nay|qua|vừa qua|gần đây|vừa rồi|gần nhất)?$/
   );
   if (!m) return null;
   let [, n, unit, direction] = m;
@@ -431,7 +432,9 @@ export function parseDateRange(text) {
   for (const fn of matchers) {
     const result = fn(text, today);
     if (result) {
-      return { start: result[0].toISODate(), end: result[1].toISODate() };
+      const ret = { start: result[0].toISODate(), end: result[1].toISODate() };
+      console.log(" to:", ret);
+      return ret;
     }
   }
   return null;

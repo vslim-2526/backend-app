@@ -137,7 +137,7 @@ export function mapAddExpenseFramesToRecords(
     type: "expense" as any,
     description: (frame.description || "").concat(
       frame.location || frame.target_location
-        ? `ở ${frame.location || frame.target_location}`
+        ? ` ở ${frame.location || frame.target_location}`
         : ""
     ),
     price: (() => {
@@ -186,25 +186,23 @@ export function frameToCriteria(userId: string, frame: ExpenseFrame): any {
   let location: string | undefined;
   let category: string | undefined;
 
-  if (frame.intent === "update_expense") {
-    // For update: prioritize condition_* fields, then regular fields
-    description = frame.condition_description || frame.description;
-    price = frame.condition_price || frame.price;
-    date = frame.condition_date || frame.date;
-    location = frame.condition_location || frame.location;
-    category = frame.category;
-  } else {
-    // For search/delete/stat: use condition_* or regular fields
-    description = frame.condition_description || frame.description;
-    price = frame.condition_price || frame.price;
-    date = frame.condition_date || frame.date;
-    location = frame.condition_location || frame.location;
-    category = frame.category;
+  description = frame.condition_description || frame.description;
+  price = frame.condition_price || frame.price;
+  date = frame.condition_date || frame.date;
+  location = frame.condition_location || frame.location;
+  category = frame.category;
+
+  if (description || location) {
+    criteria.description = {
+      $regex:
+        (description ?? "") +
+        (description && location ? " " : "") +
+        (location ? "ở " : "") +
+        (location ?? ""),
+      $options: "i",
+    };
   }
 
-  if (description) {
-    criteria.description = { $regex: description, $options: "i" };
-  }
   if (price) {
     if (typeof price === "number") {
       criteria.price = price;
@@ -280,11 +278,41 @@ export function buildUpdateData(
   const targetLocation = frame.target_location || frame.location;
   const targetCategory = frame.category;
 
+  let jointDescription: string;
+
+  // Remove trailing " ở location" if present in description
+  const existingDesc =
+    targetDescription ??
+    (existingExpense.description
+      ? existingExpense.description.replace(/\s*ở\s+.*$/i, "").trim()
+      : "") ??
+    "";
+  const newDescription = existingDesc;
+  const newLocation =
+    targetLocation ??
+    (() => {
+      // "Ăn trưa ở Hồ Gươm" -> extract location "Hồ Gươm"
+      const desc = existingExpense.description || "";
+      const m = desc.match(/\s*ở\s+(.*)$/i);
+      return m ? m[1] : existingExpense.location || "";
+    })();
+
+  // If both have values, join using " ở "
+  if (newDescription && newLocation) {
+    jointDescription = `${newDescription} ở ${newLocation}`;
+  } else if (newDescription) {
+    jointDescription = newDescription;
+  } else if (newLocation) {
+    jointDescription = `ở ${newLocation}`;
+  } else {
+    jointDescription = "";
+  }
+
   return {
     _id: existingExpense._id.toString(),
     user_id: userId,
     type: frame.type || existingExpense.type || "expense",
-    description: targetDescription || existingExpense.description,
+    description: jointDescription,
     price: (() => {
       if (!targetPrice && targetPrice !== 0) return existingExpense.price;
       if (typeof targetPrice === "number") return Math.round(targetPrice);
@@ -318,6 +346,11 @@ export function frameToStatisticsCriteria(
   const criteria: any = {
     user_id: userId,
   };
+
+  const text = (frame.criteria || frame.description || "").toString().trim();
+  if (text) {
+    criteria.description = { $regex: text, $options: "i" };
+  }
 
   // Check for date range string first (for stat_expense)
   if (frame.date && typeof frame.date === "string") {

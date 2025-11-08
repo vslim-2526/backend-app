@@ -98,7 +98,7 @@ app.post("/v1/test/price", async (req, res, next) => {
 });
 
 app.get("/health", (req, res, next) => {
-  res.status(200).json({ status: "OK", message: "Healthy!" });
+  res.status(200).json({ status: "OK", message: "Healthy!", version: "1.0.2" });
 });
 
 app.listen(PORT, () => {
