@@ -218,7 +218,7 @@ export class ExpenseModel {
         {
           $group: {
             _id: "$category",
-            totalAmount: { $sum: { $toInt: "$amount" } },
+            totalPrice: { $sum: { $toInt: "$price" } },
             count: { $sum: 1 },
           },
         },
@@ -228,7 +228,7 @@ export class ExpenseModel {
     const formattedStats: any = {};
     stats.forEach((stat) => {
       formattedStats[stat._id] = {
-        totalAmount: stat.totalAmount,
+        totalPrice: stat.totalPrice,
         count: stat.count,
       };
     });

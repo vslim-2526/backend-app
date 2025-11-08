@@ -8,7 +8,11 @@ export class ChatController {
   async handleChat(userId: string, utterance: string) {
     console.log("Handling chat for user:", userId, "utterance:", utterance);
     const cacheKey = `chat_${userId}`;
-    const unfilledFrames = cache.get(cacheKey) as ExpenseFrame[] | undefined;
+    const unfilledFrames = (
+      cache.get(cacheKey) as ExpenseFrame[] | undefined
+    )?.filter((f) => f.ttl > 0);
+
+    unfilledFrames?.forEach((f) => --f.ttl);
 
     const utteranceInfo: UtteranceInfo = await new LlmModel().parseUtterance(
       utterance
@@ -36,12 +40,15 @@ export class ChatController {
 
     // Save incompleteFrames to cache and generate message asking for more info
     let message = null;
+    cache.del(cacheKey);
+
+    const TURN_TO_LIVE = 0;
     if (incompleteFrames.length > 0) {
-      cache.set(cacheKey, incompleteFrames);
+      cache.set(
+        cacheKey,
+        incompleteFrames.map((f) => ({ ...f, ttl: f.ttl ?? TURN_TO_LIVE }))
+      );
       message = this.generateMissingInfoMessage(incompleteFrames);
-    } else {
-      // Clear cache if all frames are complete
-      cache.del(cacheKey);
     }
 
     return { doableFrames, incompleteFrames, message, ret };
@@ -351,8 +358,7 @@ export class ChatController {
         }
       } else if (
         frame.intent === "delete_expense" ||
-        frame.intent === "search_expense" ||
-        frame.intent === "stat_expense"
+        frame.intent === "search_expense"
       ) {
         // These intents need at least ONE condition field
         const hasCondition =
@@ -368,6 +374,12 @@ export class ChatController {
           missingFields.push(
             "ít nhất một trong: mô tả, giá tiền, ngày tháng, hoặc địa điểm"
           );
+        }
+      } else if (frame.intent === "stat_expense") {
+        // These intents need at least ONE condition field
+        const hasCondition = frame.date || frame.condition_date;
+        if (!hasCondition) {
+          missingFields.push("khoảng thời gian cần thống kê");
         }
       } else if (frame.intent === "update_expense") {
         // update_expense needs both condition and target fields
@@ -408,7 +420,7 @@ export class ChatController {
       if (missingFields.length > 0) {
         const intentName = this.getIntentDisplayName(frame.intent);
         messages.push(
-          `Để ${intentName}, vui lòng cung cấp: ${missingFields.join(", ")}`
+          `Để ${intentName}, vui lòng cung cấp ${missingFields.join(", ")}`
         );
       }
     }
@@ -427,22 +439,6 @@ export class ChatController {
     return intentMap[intent] || intent;
   }
 
-  /**
-   * Maps entity keys from LLM to frame keys based on intent
-   * - add_expense: only accepts target_* variants (or base keys which are treated as target)
-   * - search/delete/stat: only accept condition_* variants (or base keys which are treated as condition)
-   * - update_expense: accepts both condition_* (for finding) and target_* (for updating)
-   *
-   * Entity keys from LLM can be:
-   * - Base: price, date, description, location
-   * - Target: target_price, target_date, target_description, target_location
-   * - Condition: condition_price, condition_date, condition_description, condition_location
-   *
-   * Frame keys (stored in frame):
-   * - For add_expense: price, date, description, location (all represent target values)
-   * - For search/delete/stat: price, date, description, location (all represent condition values)
-   * - For update_expense: condition_* for finding, target_* for updating, or regular fields
-   */
   private mapEntityKeyToFrameKey(entityKey: string, intent: Intent): string {
     // Extract base key
     let baseKey: string;
