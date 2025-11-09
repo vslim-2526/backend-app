@@ -5,6 +5,7 @@ import { PORT, ENV } from "../config";
 import { ChatController, ExpenseController } from "./app/controller";
 import * as Utils from "./app/utils";
 import * as Middlewares from "./app/middleware/index";
+import { cache } from "./app/globalClient";
 
 const app = express();
 
@@ -94,6 +95,20 @@ app.post("/v1/test/price", async (req, res, next) => {
   const result = await Utils.parseVietnameseMoney(req.body.text as string);
 
   res.status(200).json(result);
+  next();
+});
+
+app.get("/v1/cache", async (req, res, next) => {
+  const sanUserId = Utils.sanitizeString((req.query.user_id as string) || "");
+
+  if (!sanUserId) {
+    return res.status(400).json({ error: "user_id is required" });
+  }
+
+  const cacheKey = `chat_${sanUserId}`;
+  const cacheValue = cache.get(cacheKey);
+
+  res.status(200).json({ user_id: sanUserId, cache: cacheValue || null });
   next();
 });
 

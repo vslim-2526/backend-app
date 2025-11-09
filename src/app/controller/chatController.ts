@@ -31,23 +31,26 @@ export class ChatController {
       }
     }
 
-    const { doableFrames, incompleteFrames } = this.groupFrameByActions(
+    let { doableFrames, incompleteFrames } = this.groupFrameByActions(
       utteranceInfo,
       unfilledFrames
     );
 
+    const TURN_TO_LIVE = 1;
+
+    incompleteFrames = incompleteFrames
+      .map((f) => ({ ...f, ttl: f.ttl ?? TURN_TO_LIVE }))
+      .filter((f) => f.ttl > 0);
     const ret = await this.executeFrames(userId, doableFrames);
+
+    doableFrames = doableFrames.map((f) => ({ ...f, ttl: undefined }));
 
     // Save incompleteFrames to cache and generate message asking for more info
     let message = null;
     cache.del(cacheKey);
 
-    const TURN_TO_LIVE = 0;
     if (incompleteFrames.length > 0) {
-      cache.set(
-        cacheKey,
-        incompleteFrames.map((f) => ({ ...f, ttl: f.ttl ?? TURN_TO_LIVE }))
-      );
+      cache.set(cacheKey, incompleteFrames);
       message = this.generateMissingInfoMessage(incompleteFrames);
     }
 
@@ -58,14 +61,6 @@ export class ChatController {
     utterance: UtteranceInfo,
     initFrames: ExpenseFrame[] = []
   ): any {
-    // let noneCount = -1;
-    // while (++noneCount) {
-    //   if (utterance.entities[noneCount]?.intent != "none") {
-    //     // or != "add-in"
-    //     break;
-    //   }
-    // }
-
     let lastChatFrames: ExpenseFrame[] = initFrames;
 
     let idx = 0;
