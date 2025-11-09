@@ -119,7 +119,7 @@ const NUM_SUFFIX_RE =
 const NUM_UNIT_RUOI_RE =
   /(?<num>\d+(?:[.,]\d+)?)\s*(?<unit>tỷ|tỉ|triệu|tr|nghìn|ngàn|k|ka|cá|ca|tỏi)\s*rưỡi\b/g;
 const NUM_SUFFIX_TAIL_RE =
-  /(?<num>\d+(?:[.,]\d+)?)\s*(?<unit>tỷ|tỉ|triệu|tr|nghìn|ngàn|k|ka|cá|ca|tỏi|m|b)\s*(?<tail>\d)\b|(?<num2>\d+(?:[.,]\d+)?)(?<unit2>tỷ|tỉ|triệu|tr|nghìn|ngàn|k|ka|cá|ca|tỏi|m|b)(?<tail2>\d)/g;
+  /(?<num>\d+(?:[.,]\d+)?)\s*(?<unit>tỷ|tỉ|triệu|tr|nghìn|ngàn|k|ka|cá|ca|tỏi|m|b)\s*(?<tail>\d+)\b|(?<num2>\d+(?:[.,]\d+)?)(?<unit2>tỷ|tỉ|triệu|tr|nghìn|ngàn|k|ka|cá|ca|tỏi|m|b)(?<tail2>\d+)/g;
 const PURE_NUMBER_RE = /^\s*([+-]?\d+(?:[.,]\d{1,2})?)\s*$/;
 
 // ========== PARSERS ==========
@@ -175,7 +175,11 @@ function _parse_numeric_suffix_with_tail(text) {
       base = _to_float(m.groups.num2);
       tail = parseInt(m.groups.tail2);
     }
-    total += Math.round(base * mult + (mult / 10.0) * tail);
+    // For multi-digit tails, interpret as units of (mult / 1000)
+    // For single-digit tails, interpret as units of (mult / 10) for backward compatibility
+    const tailDigits = String(tail).length;
+    const tailMultiplier = tailDigits > 1 ? mult / 1000 : mult / 10.0;
+    total += Math.round(base * mult + tailMultiplier * tail);
     last = m.index + m[0].length;
   }
   parts.push(text.slice(last));
