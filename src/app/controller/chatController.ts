@@ -408,14 +408,18 @@ export class ChatController {
         }
       } else {
         // Intent with no specific fields yet
-        messages.push(`Vui lòng cung cấp thêm thông tin cho ${frame.intent}`);
+        messages.push(
+          `Bạn vui lòng cung cấp thêm thông tin cho ${frame.intent} nhé!`
+        );
         continue;
       }
 
       if (missingFields.length > 0) {
         const intentName = this.getIntentDisplayName(frame.intent);
         messages.push(
-          `Để ${intentName}, vui lòng cung cấp ${missingFields.join(", ")}`
+          `Để ${intentName}, bạn vui lòng cung cấp ${missingFields.join(
+            ", "
+          )} nhé!`
         );
       }
     }
