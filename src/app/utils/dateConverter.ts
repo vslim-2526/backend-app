@@ -339,6 +339,9 @@ const rangeVariants = {
   trong: "",
   hãy: "",
   cả: "",
+  "tuần này": "tuần nay",
+  "tháng này": "tháng nay",
+  "năm này": "năm nay",
 };
 
 function normalizeDateRange(text) {
@@ -395,7 +398,7 @@ function matchFromTo(text, today) {
 
 function matchNumericRange(text, today) {
   const m = text.match(
-    /^(\d*)\s*(ngày|tuần|tháng|năm)\s*(tới|nay|qua|vừa qua|gần đây|vừa rồi|gần nhất)?$/
+    /^(\d*)\s*(ngày|tuần|tháng|năm)\s*(tới|sau|sắp tới|nay|qua|vừa qua|gần đây|vừa rồi|gần nhất)?$/
   );
   if (!m) return null;
   let [, n, unit, direction] = m;
@@ -418,6 +421,109 @@ function matchNumericRange(text, today) {
   }
 }
 
+function parseYear(yearStr) {
+  const year = parseInt(yearStr);
+  if (yearStr.length === 2) {
+    // Convert 2-digit year: < 50 → 2000+, >= 50 → 1900+
+    return year < 50 ? 2000 + year : 1900 + year;
+  } else if (yearStr.length === 4) {
+    // Validate 4-digit year
+    if (year >= 1900 && year <= 2100) {
+      return year;
+    }
+  }
+  return null;
+}
+
+function matchMonthYear(text, today) {
+  // Match "tháng XX năm sau" (next year)
+  let m = text.match(/^tháng\s+(\d{1,2})\s+năm\s+(sau|tiếp theo|tới)$/);
+  if (m) {
+    const month = parseInt(m[1]);
+    if (month >= 1 && month <= 12) {
+      const year = today.year + 1;
+      const start = DateTime.fromObject({
+        year: year,
+        month: month,
+        day: 1,
+      });
+      const end = start.endOf("month");
+      return [start, end];
+    }
+  }
+
+  // Match "tháng XX năm ngoái" or "tháng XX năm trước" (last year)
+  m = text.match(/^tháng\s+(\d{1,2})\s+năm\s+(ngoái|trước)$/);
+  if (m) {
+    const month = parseInt(m[1]);
+    if (month >= 1 && month <= 12) {
+      const year = today.year - 1;
+      const start = DateTime.fromObject({
+        year: year,
+        month: month,
+        day: 1,
+      });
+      const end = start.endOf("month");
+      return [start, end];
+    }
+  }
+
+  // Match "tháng XX năm YY" or "tháng XX năm YYYY"
+  m = text.match(/^tháng\s+(\d{1,2})\s+năm\s+(\d{2,4})$/);
+  if (m) {
+    const month = parseInt(m[1]);
+    const year = parseYear(m[2]);
+    if (month >= 1 && month <= 12 && year !== null) {
+      const start = DateTime.fromObject({
+        year: year,
+        month: month,
+        day: 1,
+      });
+      const end = start.endOf("month");
+      return [start, end];
+    }
+  }
+
+  // Match "tháng XX" where XX is 1-12
+  m = text.match(/^tháng\s+(\d{1,2})$/);
+  if (m) {
+    const month = parseInt(m[1]);
+    if (month >= 1 && month <= 12) {
+      const start = DateTime.fromObject({
+        year: today.year,
+        month: month,
+        day: 1,
+      });
+      const end = start.endOf("month");
+      return [start, end];
+    }
+  }
+
+  // Match "năm XX" where XX is 2 digits
+  m = text.match(/^năm\s+(\d{2})$/);
+  if (m) {
+    const year = parseYear(m[1]);
+    if (year !== null) {
+      const start = DateTime.fromObject({ year: year, month: 1, day: 1 });
+      const end = start.endOf("year");
+      return [start, end];
+    }
+  }
+
+  // Match "năm XXXX" where XXXX is 4 digits
+  m = text.match(/^năm\s+(\d{4})$/);
+  if (m) {
+    const year = parseYear(m[1]);
+    if (year !== null) {
+      const start = DateTime.fromObject({ year: year, month: 1, day: 1 });
+      const end = start.endOf("year");
+      return [start, end];
+    }
+  }
+
+  return null;
+}
+
 function matchParseDate(text, _) {
   const d = parseDate(text);
   return d ? [d, d] : null;
@@ -428,7 +534,12 @@ export function parseDateRange(text) {
   const today = DateTime.now().startOf("day");
   text = normalizeDateRange(text);
 
-  const matchers = [matchNumericRange, matchFromTo, matchParseDate];
+  const matchers = [
+    matchNumericRange,
+    matchFromTo,
+    matchMonthYear,
+    matchParseDate,
+  ];
   for (const fn of matchers) {
     const result = fn(text, today);
     if (result) {
@@ -439,6 +550,8 @@ export function parseDateRange(text) {
   }
   return null;
 }
+
+// console.log(parseDateRange("Từ 15 tới 27/10"));
 
 // function testParseDateRange() {
 //   const today = DateTime.now().toISODate();
