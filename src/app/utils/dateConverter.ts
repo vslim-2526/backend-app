@@ -198,6 +198,15 @@ function matchSpecificMonthYear(text, today) {
     return safeDate(today.year - 1, parseInt(mth), parseInt(d));
   }
 
+  // dd/mm năm nay
+  m =
+    text.match(/(\d{1,2})[./-](\d{1,2}) năm nay/) ||
+    text.match(/(\d{1,2}) tháng (\d{1,2}) năm nay/);
+  if (m) {
+    const [_, d, mth] = m;
+    return safeDate(today.year, parseInt(mth), parseInt(d));
+  }
+
   // ngày X tháng sau
   m = text.match(/(ngày\s*)?(\d{1,2})([./-](\d{1,2}))?\s*tháng sau/);
   if (m) {
@@ -211,6 +220,14 @@ function matchSpecificMonthYear(text, today) {
   if (m) {
     const d = parseInt(m[2]);
     const prev = today.minus({ months: 1 });
+    return safeDate(prev.year, prev.month, d);
+  }
+
+  // ngày X tháng trước
+  m = text.match(/(ngày\s*)?(\d{1,2})([./-](\d{1,2}))? tháng này/);
+  if (m) {
+    const d = parseInt(m[2]);
+    const prev = today.minus({ months: 0 });
     return safeDate(prev.year, prev.month, d);
   }
 
@@ -339,8 +356,8 @@ const rangeVariants = {
   trong: "",
   hãy: "",
   cả: "",
+  thg: "tháng",
   "tuần này": "tuần nay",
-  "tháng này": "tháng nay",
   "năm này": "năm nay",
 };
 
@@ -413,7 +430,10 @@ function matchNumericRange(text, today) {
   if (["tới", "sau", "sắp tới"].includes(direction)) {
     return [today, today.plus(delta)];
   } else {
-    if (["nay", "gần đây", "gần nhất"].includes(direction) && unit == "ngày") {
+    if (
+      ["nay", "này", "gần đây", "gần nhất"].includes(direction) &&
+      unit == "ngày"
+    ) {
       delta = { days: n - 1 };
       return [today.minus(delta), today];
     }
@@ -551,7 +571,7 @@ export function parseDateRange(text) {
   return null;
 }
 
-// console.log(parseDateRange("Từ 15 tới 27/10"));
+// console.log(parseDateRange("ngay 30 thg này"));
 
 // function testParseDateRange() {
 //   const today = DateTime.now().toISODate();
