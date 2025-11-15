@@ -113,7 +113,7 @@ app.get("/v1/cache", async (req, res, next) => {
 });
 
 app.get("/health", (req, res, next) => {
-  res.status(200).json({ status: "OK", message: "Healthy!", version: "1.0.5" });
+  res.status(200).json({ status: "OK", message: "Healthy!", version: "1.0.6" });
 });
 
 app.listen(PORT, () => {
