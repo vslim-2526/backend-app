@@ -652,7 +652,7 @@ export function parseDateRange(text) {
   return null;
 }
 
-console.log(parseDateRange("tuần trước"));
+// console.log(parseDateRange("tuần trước"));
 
 // chua duoc:
 // từ tuần trước tới hôm nay
