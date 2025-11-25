@@ -21,6 +21,16 @@ function convertVietnameseNumbers(text) {
     "mười bảy": 17,
     "mười tám": 18,
     "mười chín": 19,
+    "hai mươi hai": 22,
+    "hai mươi ba": 23,
+    "hai mươi tư": 24,
+    "hai mươi năm": 25,
+    "hai mươi sáu": 26,
+    "hai mươi bảy": 27,
+    "hai mươi tám": 28,
+    "hai mươi chín": 29,
+    "hai mươi mười": 30,
+    "hai mươi mười một": 31,
   };
 
   const BASICS = {
@@ -456,6 +466,8 @@ function parseYear(yearStr) {
 }
 
 function matchMonthYear(text, today) {
+  text = normalizeText(convertVietnameseNumbers(text));
+
   // Match "tháng XX năm sau" (next year)
   let m = text.match(/^tháng\s+(\d{1,2})\s+năm\s+(sau|tiếp theo|tới)$/);
   if (m) {
@@ -544,6 +556,73 @@ function matchMonthYear(text, today) {
   return null;
 }
 
+function matchExact(text, today) {
+  let m = text.match(/^tháng này$/);
+  if (m) {
+    return [today.startOf("month"), today.endOf("month")];
+  }
+
+  m = text.match(/^năm nay$/);
+  if (m) {
+    return [today.startOf("year"), today.endOf("year")];
+  }
+
+  m = text.match(/^tháng sau$/);
+  if (m) {
+    return [
+      today.plus({ months: 1 }).startOf("month"),
+      today.plus({ months: 1 }).endOf("month"),
+    ];
+  }
+
+  m = text.match(/^năm sau$/);
+  if (m) {
+    return [
+      today.plus({ years: 1 }).startOf("year"),
+      today.plus({ years: 1 }).endOf("year"),
+    ];
+  }
+
+  m = text.match(/^tháng trước$/);
+  if (m) {
+    return [
+      today.minus({ months: 1 }).startOf("month"),
+      today.minus({ months: 1 }).endOf("month"),
+    ];
+  }
+
+  m = text.match(/^năm trước$/);
+  if (m) {
+    return [
+      today.minus({ years: 1 }).startOf("year"),
+      today.minus({ years: 1 }).endOf("year"),
+    ];
+  }
+
+  m = text.match(/^tuần này$/);
+  if (m) {
+    return [today.startOf("week"), today.endOf("week")];
+  }
+
+  m = text.match(/^tuần trước$/);
+  if (m) {
+    return [
+      today.minus({ weeks: 1 }).startOf("week"),
+      today.minus({ weeks: 1 }).endOf("week"),
+    ];
+  }
+
+  m = text.match(/^tuần sau$/);
+  if (m) {
+    return [
+      today.plus({ weeks: 1 }).startOf("week"),
+      today.plus({ weeks: 1 }).endOf("week"),
+    ];
+  }
+
+  return null;
+}
+
 function matchParseDate(text, _) {
   const d = parseDate(text);
   return d ? [d, d] : null;
@@ -555,6 +634,7 @@ export function parseDateRange(text) {
   text = normalizeDateRange(text);
 
   const matchers = [
+    matchExact,
     matchNumericRange,
     matchFromTo,
     matchMonthYear,
@@ -564,6 +644,7 @@ export function parseDateRange(text) {
     const result = fn(text, today);
     if (result) {
       const ret = { start: result[0].toISODate(), end: result[1].toISODate() };
+      console.log("fn:", fn.name);
       console.log(" to:", ret);
       return ret;
     }
@@ -571,7 +652,18 @@ export function parseDateRange(text) {
   return null;
 }
 
-// console.log(parseDateRange("ngay 30 thg này"));
+// console.log(parseDateRange("tuần trước"));
+
+// chua duoc:
+// từ tuần trước tới hôm nay
+// ba mốt tháng vừa qua
+// ba mươi tháng vừa rồi (ba mươi tháng rồi chay ok)
+// tháng ba, tháng hai
+// tháng3
+// hai mươi tư tháng ba
+// hai mươi tư tháng hai
+// hai tư tháng hai
+// hai muoi bon thang ba
 
 // function testParseDateRange() {
 //   const today = DateTime.now().toISODate();
