@@ -178,9 +178,16 @@ export class ExpenseModel {
       }))
     );
 
+    const updatedExpenseIds = expenseRecords.map((expense) => expense._id);
+    const updatedExpenses = await db
+      .collection<Expense>("Expense")
+      .find({ _id: { $in: updatedExpenseIds } })
+      .toArray();
+
     return {
       success: result.modifiedCount === expenseRecords.length,
       modifiedCount: result.modifiedCount,
+      expenses: updatedExpenses,
     };
   };
 
@@ -189,6 +196,10 @@ export class ExpenseModel {
     const db = client.db("VSLIM");
 
     const objectIds = expense_ids.map((id) => new ObjectId(id));
+    const expensesToDelete = await db
+      .collection<Expense>("Expense")
+      .find({ _id: { $in: objectIds } })
+      .toArray();
 
     const result = await db
       .collection("Expense")
@@ -197,6 +208,7 @@ export class ExpenseModel {
     return {
       success: result.deletedCount === expense_ids.length,
       deletedCount: result.deletedCount,
+      expenses: expensesToDelete,
     };
   };
 
